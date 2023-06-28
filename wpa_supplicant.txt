@@ -1,0 +1,31 @@
+# wpa_supplicant Improvements - Gentoo
+# Github geket
+# Twitter r3sh1ram
+
+# Ensure you are using optimal DNS servers in /etc/resolv.conf.
+# Each PRIORITY per CONNECTION should be EXPLICIT. Sometimes it will pick one on that priority.
+nano /etc/resolv.conf
+# Once optimal, chattr to ensure no packages, system or even root will modify.
+chattr +i /etc/resolv.conf
+
+# Reseat the required services into your memory page.
+rc-service wpa_supplicant stop
+rc-service wpa_supplicant restart
+rc-service dhcpcd stop
+rc-service dhcpcd restart
+# Determine which interface to direct DHCP
+ip a
+# Replace <interface> with desired entry.
+dhcpcd <interface>
+
+# If you are experiencing slow connections, then you may have to change your WiFi card's regulatory body.
+# Ensure that wireless-regdb is installed, if it is then portage will index it as a "reinstall".
+emerge -av net-wireless/wireless-regdb
+# Change the regulatory body to the US standard.
+iw reg set US 
+# Find your local domain here 'https://kernel.googlesource.com/pub/scm/linux/kernel/git/linville/wireless-regdb/+/af726449e73286e1375e7a72336045d9d0ce84f8/db.txt'
+# Ensure that the regulatory has changed succesfully
+iw reg get
+
+# Note that the resolv.conf is now unwritable, if you want to make changes to it again in the future you will have to run:
+chattr -i /etc/resolv.conf
